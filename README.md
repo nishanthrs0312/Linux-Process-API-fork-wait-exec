@@ -25,6 +25,35 @@ Test the C Program for the desired output.
 
 ## C Program to create new process using Linux API system calls fork() and getpid() , getppid() and to print process ID and parent Process ID using Linux API system calls
 
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+int main()
+{
+    int pid = fork();
+
+    if (pid < 0)
+    {
+        printf("Fork failed\n");
+        return 1;
+    }
+    else if (pid == 0)
+    {
+        printf("I am child, my PID is %d\n", getpid());
+        printf("My parent PID is %d\n", getppid());
+    }
+    else
+    {
+        printf("I am parent, my PID is %d\n", getpid());
+        wait(NULL);
+        printf("Child process completed.\n");
+    }
+
+    return 0;
+}```
 
 
 
@@ -48,7 +77,63 @@ Test the C Program for the desired output.
 
 ## C Program to execute Linux system commands using Linux API system calls exec() , exit() , wait() family
 
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
+int main()
+{
+    int status;
+
+    // Using execl() with full path
+    printf("Running ps using execl()\n");
+
+    if (fork() == 0)
+    {
+        execl("/bin/ps", "ps", "-f", NULL);
+        perror("execl failed");
+        exit(1);
+    }
+
+    wait(&status);
+
+    if (WIFEXITED(status))
+    {
+        printf("Child exited with status: %d\n\n", WEXITSTATUS(status));
+    }
+    else
+    {
+        printf("Child did not exit successfully\n\n");
+    }
+
+    // Using execlp() without full path
+    printf("Running ps using execlp()\n");
+
+    if (fork() == 0)
+    {
+        execlp("ps", "ps", "-f", NULL);
+        perror("execlp failed");
+        exit(1);
+    }
+
+    wait(&status);
+
+    if (WIFEXITED(status))
+    {
+        printf("Child exited with status: %d\n", WEXITSTATUS(status));
+    }
+    else
+    {
+        printf("Child did not exit successfully\n");
+    }
+
+    printf("\nProgram completed successfully.\n");
+
+    return 0;
+}```
 
 
 
